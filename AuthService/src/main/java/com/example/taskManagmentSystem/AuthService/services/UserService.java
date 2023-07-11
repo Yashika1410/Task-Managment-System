@@ -34,7 +34,7 @@ public class UserService {
      */
     public User registerUser(final SignUpModel user) {
         if (userRepo.existsByEmail(user.getEmail().toLowerCase()) 
-        && userRepo.existsByUserName(user.getUserName())) {
+        || userRepo.existsByUserName(user.getUserName())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "User Already Exits by this email or User name");
         } else {
@@ -48,5 +48,56 @@ public class UserService {
             newUser.setUserName(user.getUserName());
             return userRepo.save(newUser);
         }
+        
+    }
+    
+    /**
+     * User service method to chack user email and password and return user
+     * details if valid.
+     * 
+     * @param emailOrUserName    user email or password.
+     * @param password user unhased password.
+     * @return user details if user email and password are valid.
+     */
+    public final User loginUser(final String emailOrUserName, final String password) {
+        if (userRepo.existsByEmail(emailOrUserName)) {
+            User userDetails = userRepo.findByEmail(emailOrUserName);
+            if (BCrypt.verifyer().verify(password.toCharArray(),
+                    userDetails.getPassword()) != null) {
+                return userDetails;
+            } else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "Incorrect Password");
+            }
+        } else if(userRepo.existsByUserName(emailOrUserName)){
+            User userDetails = userRepo.findByUserName(emailOrUserName);
+            if (BCrypt.verifyer().verify(password.toCharArray(),
+                    userDetails.getPassword()) != null) {
+                return userDetails;
+            } else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "Incorrect Password");
+            }
+    } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "User Not Found");
+        }
+
+    }
+
+    /**
+     * @param email
+     * @return boolean if user exits or not.
+     */
+    public final boolean checkUserByEmail(final String email) {
+        return userRepo.existsByEmail(email);
+    }
+    
+    /**
+     * @param userName
+     * @return boolean if user exits or not.
+     */
+    public final boolean checkUserByUserName(final String userName) {
+        return userRepo.existsByUserName(userName);
     }
 }

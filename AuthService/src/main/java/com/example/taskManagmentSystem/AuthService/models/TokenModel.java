@@ -18,13 +18,9 @@ public class TokenModel {
      */
     private String userName;
     /**
-     * first name of the user.
+     * name of the user.
      */
-    private String firstName;
-    /**
-     * last name of the user.
-     */
-    private String lastName;
+    private String name;
     /**
      * email of the user.
      */
