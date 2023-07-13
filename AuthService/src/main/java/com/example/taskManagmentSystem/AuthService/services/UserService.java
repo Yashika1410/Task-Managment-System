@@ -60,7 +60,7 @@ public class UserService {
      * @return user details if user email and password are valid.
      */
     public final User loginUser(final String emailOrUserName, final String password) {
-        if (userRepo.existsByEmail(emailOrUserName)) {
+        if (userRepo.existsByEmail(emailOrUserName.toLowerCase())) {
             User userDetails = userRepo.findByEmail(emailOrUserName);
             if (BCrypt.verifyer().verify(password.toCharArray(),
                     userDetails.getPassword()) != null) {

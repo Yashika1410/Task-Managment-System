@@ -4,13 +4,17 @@ import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -31,6 +35,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
+@RequestMapping("authentication/api/v1")
 public class UserController {
     /**
      * Autowired UserService class.
@@ -54,7 +59,7 @@ public class UserController {
      * @return returns auth model which contains user email and token.
      */
     @PostMapping("/sign-up")
-    public AuthModel signUp(@RequestBody final SignUpModel user) {
+    public AuthModel signUp(@Valid @RequestBody final SignUpModel user) {
         User newUser = userService.registerUser(user);
         AuthModel authModel = new AuthModel();
         authModel.setToken(userJwtTokenService.getToken(newUser));
@@ -70,14 +75,14 @@ public class UserController {
      * @return returns auth model which contains user email and token.
      */
     @PostMapping("/sign-in")
-    public AuthModel signIn(@RequestBody final LoginModel user) {
+    public ResponseEntity<AuthModel> signIn(@Valid @RequestBody final LoginModel user) {
         User authUser = userService.loginUser(
-                user.getEmail().toLowerCase(), user.getPassword());
+                user.getEmailOrUserName(), user.getPassword());
         AuthModel authModel = new AuthModel();
         authModel.setToken(userJwtTokenService.getToken(authUser));
         authModel.setEmail(authUser.getEmail().toLowerCase());
         authModel.setUserName(authUser.getUserName());
-        return authModel;
+        return ResponseEntity.ok(authModel);
     }
     
     /**

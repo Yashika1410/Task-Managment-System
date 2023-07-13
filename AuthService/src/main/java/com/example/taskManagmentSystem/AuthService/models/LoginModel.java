@@ -1,6 +1,7 @@
 package com.example.taskManagmentSystem.AuthService.models;
 
 import lombok.Data;
+import lombok.NonNull;
 
 /**
  * User Model class for response.
@@ -10,19 +11,13 @@ public class LoginModel {
     /**
      * User email.
      */
-    private String email;
+    @NonNull
+    private String emailOrUserName;
 
     /**
      * User unhashed password.
      */
+    @NonNull
     private String password;
 
-    /**
-     * @param userEmail
-     * @param userPassword
-     */
-    public LoginModel(final String userEmail, final String userPassword) {
-        this.email = userEmail;
-        this.password = userPassword;
-    }
 }

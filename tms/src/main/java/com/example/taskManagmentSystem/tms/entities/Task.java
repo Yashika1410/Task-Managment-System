@@ -43,12 +43,12 @@ public class Task {
      * user_id of the task.
      */
     @Column(name = "user_id")
-    private String user_id;
+    private int userId;
 
     /**
      * due date of the task.
      */
-    @Column(name="due_date")
+    @Column(name = "due_date")
     private Timestamp dueDate;
 
     /**
@@ -56,5 +56,5 @@ public class Task {
      */
     @Column(name = "created_at")
     private Timestamp createdAt;
-    
+
 }
