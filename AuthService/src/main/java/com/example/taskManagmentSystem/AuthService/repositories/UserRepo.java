@@ -1,9 +1,13 @@
 package com.example.taskManagmentSystem.AuthService.repositories;
 
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import com.example.taskManagmentSystem.AuthService.entities.User;
 
-public interface UserRepo extends CrudRepository<User, Integer> {
+public interface UserRepo extends CrudRepository<User, String> {
     /**
      * checks if user by email already exists or not.
      * 
@@ -35,4 +39,15 @@ public interface UserRepo extends CrudRepository<User, Integer> {
      * @return return user object by user name.
      */
     User findByUserName(String userName);
+
+    
+    /**
+     * @param email user email.
+     * @param userName user name.
+     * @param id user id.
+     * @return User.
+     */
+    @Query(nativeQuery = true, value = "select * from users where email=:email and user_name=:userName")
+    Optional<User> fetchByUserNameEmail(@Param(value = "email") String email,
+     @Param(value = "userName")String userName);
 }

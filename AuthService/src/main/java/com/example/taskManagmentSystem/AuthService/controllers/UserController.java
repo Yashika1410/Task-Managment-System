@@ -1,16 +1,11 @@
 package com.example.taskManagmentSystem.AuthService.controllers;
 
-import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.Date;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -23,13 +18,9 @@ import com.example.taskManagmentSystem.AuthService.models.AuthModel;
 import com.example.taskManagmentSystem.AuthService.models.LoginModel;
 import com.example.taskManagmentSystem.AuthService.models.SignUpModel;
 import com.example.taskManagmentSystem.AuthService.models.TokenModel;
+import com.example.taskManagmentSystem.AuthService.models.UserModel;
 import com.example.taskManagmentSystem.AuthService.services.UserJwtTokenService;
 import com.example.taskManagmentSystem.AuthService.services.UserService;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.io.IOException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -47,10 +38,7 @@ public class UserController {
      */
     @Autowired
     private UserJwtTokenService userJwtTokenService;
-    /**
-     * variable which contains starting count of bearer token.
-     */
-    private static final int SUBSTRING_STARTING = 7;
+
 
     /**
      * Method that get called when sign up got hit.
@@ -61,11 +49,8 @@ public class UserController {
     @PostMapping("/sign-up")
     public AuthModel signUp(@Valid @RequestBody final SignUpModel user) {
         User newUser = userService.registerUser(user);
-        AuthModel authModel = new AuthModel();
-        authModel.setToken(userJwtTokenService.getToken(newUser));
-        authModel.setEmail(newUser.getEmail().toLowerCase());
-        authModel.setUserName(newUser.getUserName());
-        return authModel;
+        return new AuthModel(newUser,
+        userJwtTokenService.getToken(newUser));
     }
 
     /**
@@ -75,14 +60,11 @@ public class UserController {
      * @return returns auth model which contains user email and token.
      */
     @PostMapping("/sign-in")
-    public ResponseEntity<AuthModel> signIn(@Valid @RequestBody final LoginModel user) {
+    public AuthModel signIn(@Valid @RequestBody final LoginModel user) {
         User authUser = userService.loginUser(
-                user.getEmailOrUserName(), user.getPassword());
-        AuthModel authModel = new AuthModel();
-        authModel.setToken(userJwtTokenService.getToken(authUser));
-        authModel.setEmail(authUser.getEmail().toLowerCase());
-        authModel.setUserName(authUser.getUserName());
-        return ResponseEntity.ok(authModel);
+                user.getEmailOrUserName(), user.getPassword());        
+        return new AuthModel(authUser,
+        userJwtTokenService.getToken(authUser));
     }
     
     /**
@@ -95,41 +77,31 @@ public class UserController {
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     public TokenModel validateToken(
             @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) final String bearerToken) {
-        if (!bearerToken.startsWith("Bearer")
-                || bearerToken.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    "Token type is not bearer");
-        }
-        String token = bearerToken.substring(SUBSTRING_STARTING,
-                bearerToken.length()).strip();
-        try {
-            Jws<Claims> userJws = userJwtTokenService.verify(token);
-            Claims userClaim = userJws.getBody();
-            TokenModel tokenModel = new TokenModel();
-            tokenModel.setId(Integer.parseInt( userClaim.getSubject()));
-            tokenModel.setEmail(userClaim.get("email").toString());
-            tokenModel.setName(userClaim.get("name").toString());
-            tokenModel.setUserName(userClaim.get("username").toString());
-            tokenModel.setIssuedAt(userClaim.getIssuedAt());
-            tokenModel.setExpiration(userClaim.getExpiration());
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date());
-            calendar.add(Calendar.MINUTE, 1);
-            if (tokenModel.getExpiration().getTime() < calendar.getTime().getTime()) {
-                throw new ExpiredJwtException(userJws.getHeader(),
-                        userClaim, "token got expired");
-            }
-            return tokenModel;
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    e.getMessage());
-        } catch (ExpiredJwtException eJwt) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                    eJwt.getLocalizedMessage());
-        } catch (Exception ex) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    ex.getMessage());
-        }
+       try{
+        return userJwtTokenService.validateToken(bearerToken);
+    } catch(ResponseStatusException re){
+        throw new ResponseStatusException(re.getStatus(),re.getMessage());
+    }catch(Exception e){
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
+    }
+    
+    /**
+     * get user by id
+     * @param id unique id.
+     * @param bearerToken token.
+     * @return User object which contains user details.
+     */
+    @GetMapping("/users/{id}")
+    @Operation(security = @SecurityRequirement(name = "bearerAuth"))
+    public UserModel getUser(
+            @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) final String bearerToken,
+            @PathVariable("id") final String id) {
+       TokenModel tokenModel = userJwtTokenService.validateToken(bearerToken);
+       if(!tokenModel.getEmail().isEmpty() && !tokenModel.getId().isEmpty()){
+        return new UserModel(userService.getUserById(id));}
+       else{
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Unauthorized");
+    }
     }
 }

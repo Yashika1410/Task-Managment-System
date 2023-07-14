@@ -1,0 +1,14 @@
+{
+"properties": [
+{
+  "name": "jwt.issuer",
+  "type": "java.lang.String",
+  "description": "JWT token issuer'jwt.issuer'"
+},
+{
+  "name": "jwt.security.key",
+  "type": "java.lang.String",
+  "description": "JWT token security Key 'jwt.security.key'"
+}
+]
+}

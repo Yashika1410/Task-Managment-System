@@ -38,7 +38,7 @@ public class TaskService {
         task.setDueDate(taskModel.getDueDate());
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         task.setCreatedAt(timestamp);
-        return TaskModel.convertTaskToTaskModel(taskRepo.save(task));
+        return new TaskModel(taskRepo.save(task));
     }
 
     /**
@@ -47,7 +47,7 @@ public class TaskService {
      * @return TaskModel object.
      */
     public TaskModel getTask(final int id, final int userId) {
-        return TaskModel.convertTaskToTaskModel(
+        return new TaskModel(
             taskRepo.findById(id, userId).orElseThrow(
             () -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Task Not Found by this id " + id)));
@@ -63,7 +63,7 @@ public class TaskService {
     final int skip, final int limit) {
         return taskRepo.findAllByUserId(
                 userId, skip, limit).stream()
-                .map(task -> TaskModel.convertTaskToTaskModel(task))
+                .map(task -> new TaskModel(task))
                 .collect(Collectors.toList());
     }
 
@@ -82,6 +82,6 @@ public class TaskService {
         task.setDueDate(taskModel.getDueDate());
         task.setDescription(taskModel.getDescription());
         task.setStatus(taskModel.getStatus());
-        return TaskModel.convertTaskToTaskModel(taskRepo.save(task));
+        return new TaskModel(taskRepo.save(task));
     }
 }

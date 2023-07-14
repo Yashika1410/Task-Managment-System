@@ -1,5 +1,7 @@
 package com.example.taskManagmentSystem.AuthService.models;
 
+import com.example.taskManagmentSystem.AuthService.entities.User;
+
 import lombok.Data;
 
 /**
@@ -19,5 +21,15 @@ public class AuthModel {
      * User token which contains user details.
      */
     private String token;
+
+    /**
+     * @param user
+     * @param userToken
+     */
+    public AuthModel(User user,String userToken){
+        token=userToken;
+        email=user.getEmail().toLowerCase();
+        userName=user.getUserName();
+    }
 
 }

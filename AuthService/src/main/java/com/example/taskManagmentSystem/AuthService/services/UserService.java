@@ -46,6 +46,9 @@ public class UserService {
             newUser.setFirstName(user.getFirstName());
             newUser.setLastName(user.getLastName());
             newUser.setUserName(user.getUserName());
+            if (user.getRole()==null) {
+                newUser.setRole(User.UserRole.USER);
+            }
             return userRepo.save(newUser);
         }
         
@@ -99,5 +102,21 @@ public class UserService {
      */
     public final boolean checkUserByUserName(final String userName) {
         return userRepo.existsByUserName(userName);
+    }
+
+    /**
+     * @param userName userName of User.
+     * @param email email of User.
+     * @return User.
+     */
+    public final User getByEmailAndUserName(final String userName, final String email){
+        return userRepo.fetchByUserNameEmail(email, userName).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "Unauthrized"));
+    }
+
+    public final User getUserById(final String id){
+        return userRepo.findById(id).orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found by this id "+id));
     }
 }

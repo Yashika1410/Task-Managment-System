@@ -2,6 +2,8 @@ package com.example.taskManagmentSystem.AuthService.models;
 
 import java.util.Date;
 
+import com.example.taskManagmentSystem.AuthService.entities.User.UserRole;
+
 import lombok.Data;
 
 /**
@@ -12,7 +14,7 @@ public class TokenModel {
     /**
      * unique id of the user.
      */
-    private int id;
+    private String id;
     /**
      * username of the user.
      */
@@ -25,6 +27,10 @@ public class TokenModel {
      * email of the user.
      */
     private String email;
+    /**
+     * Role of the user.
+     */
+    private UserRole role;
     /**
      * issued at date which contains date at which token got generated.
      */

@@ -2,9 +2,9 @@ package com.example.taskManagmentSystem.AuthService.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import java.util.UUID;
 import javax.persistence.Table;
 import org.hibernate.annotations.ColumnTransformer;
 import lombok.Data;
@@ -17,8 +17,7 @@ public class User {
      * unique id.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private String id;
 
     /**
      * user unique email.
@@ -45,9 +44,28 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    public enum UserRole {
+        USER,
+        ADMIN
+    }
+
+    /**
+     *  role of the user.
+     */
+    @Column(name = "role", nullable = false)
+    private UserRole role;
+    
     /**
      * user hashed password.
      */
     @Column(name = "password", nullable = false)
     private String password;
+
+    @PrePersist
+    public void setUUID(){
+        id = UUID.randomUUID().toString().replace("-", "");
+        if(role==null){
+            role = UserRole.USER;
+        }
+    } 
 }

@@ -37,13 +37,11 @@ public class TaskModel {
      * @param task task object.
      * @return TaskModel object.
      */
-    public static TaskModel convertTaskToTaskModel(final Task task) {
-        TaskModel taskModel = new TaskModel();
-        taskModel.setId(task.getId());
-        taskModel.setTitle(task.getTitle());
-        taskModel.setDescription(task.getDescription());
-        taskModel.setStatus(task.getStatus());
-        taskModel.setDueDate(task.getDueDate());
-        return taskModel;
+    public TaskModel(final Task task) {
+        id = task.getId();
+        title = task.getTitle();
+        description = task.getDescription();
+        status = task.getStatus();
+        dueDate = task.getDueDate();
     }
 }
