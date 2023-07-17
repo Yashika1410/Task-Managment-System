@@ -89,6 +89,7 @@ public class AuthFilter extends HttpFilter {
                     Map<String, Object> map = (
                         Map<String, Object>) result.getBody();
                     request.setAttribute("userId", map.get("id"));
+                    request.setAttribute("role", map.get("role"));
                     filterChain.doFilter(request, response);
                 }
             } catch (HttpClientErrorException hte) {

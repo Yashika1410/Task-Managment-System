@@ -28,7 +28,7 @@ public class TaskService {
      * @return TaskModel object.
      */
     public TaskModel createNewTask(final CreateTaskModel taskModel,
-    final int userId) {
+    final String userId) {
         Task task = new Task();
         task.setTitle(taskModel.getTitle());
         task.setDescription(taskModel.getDescription());
@@ -46,11 +46,21 @@ public class TaskService {
      * @param userId unique user id.
      * @return TaskModel object.
      */
-    public TaskModel getTask(final int id, final int userId) {
+    public TaskModel getTaskByUserId(final int id, final String userId) {
         return new TaskModel(
             taskRepo.findById(id, userId).orElseThrow(
             () -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Task Not Found by this id " + id)));
+    }
+
+    /**
+     * @param id     unique id.
+     * @return Task object.
+     */
+    public Task getTask(final int id) {
+        return taskRepo.findById(id).orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND, "Task Not Found by this id " + id));
     }
 
     /**
@@ -59,7 +69,7 @@ public class TaskService {
      * @param limit  limit value.
      * @return TaskModel object.
      */
-    public List<TaskModel> getListOfTasks(final int userId,
+    public List<TaskModel> getListOfTasksByUserId(final String userId,
     final int skip, final int limit) {
         return taskRepo.findAllByUserId(
                 userId, skip, limit).stream()
@@ -68,12 +78,22 @@ public class TaskService {
     }
 
     /**
+     * @param skip   skip value.
+     * @param limit  limit value.
+     * @return Task object.
+     */
+    public List<Task> getListOfTasks(final int skip,
+    final int limit) {
+        return taskRepo.findAll(skip, limit);
+    }
+
+    /**
      * @param userId  unique user id.
      * @param id unique id.
      * @param taskModel TaskModel object.
      * @return TaskModel object.
      */
-    public TaskModel updateTask(final int userId,
+    public TaskModel updateTask(final String userId,
     final int id, final TaskModel taskModel) {
         Task task = taskRepo.findById(id, userId).orElseThrow(
             () -> new ResponseStatusException(

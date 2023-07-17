@@ -43,7 +43,7 @@ public class Task {
      * user_id of the task.
      */
     @Column(name = "user_id")
-    private int userId;
+    private String userId;
 
     /**
      * due date of the task.

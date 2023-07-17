@@ -21,9 +21,20 @@ public interface TaskRepo extends CrudRepository<Task, Integer> {
     @Query(nativeQuery = true,
     value = ("select * from tasks where user_id=:userId order "
     + "by id desc limit :skip, :limit"))
-    List<Task> findAllByUserId(@Param(value = "userId") int userId,
+    List<Task> findAllByUserId(@Param(value = "userId") String userId,
     @Param(value = "skip") int skip,
     @Param(value = "limit") int limit);
+
+    /**
+     * @param skip   number of records to be skipped.
+     * @param limit  number of records to be fetch.
+     * @return List of tasks.
+     */
+
+    @Query(nativeQuery = true, value = ("select * from tasks order "
+            + "by id desc limit :skip, :limit"))
+    List<Task> findAll(@Param(value = "skip") int skip,
+            @Param(value = "limit") int limit);
     /**
      * @param id unique id.
      * @param userId unique userId.
@@ -32,6 +43,6 @@ public interface TaskRepo extends CrudRepository<Task, Integer> {
     @Query(nativeQuery = true,
     value = ("select * from tasks where id=:id and user_id=:userId"))
     Optional<Task> findById(@Param(value = "id") int id,
-    @Param(value = "userId") int userId);
+    @Param(value = "userId") String userId);
     
 }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.taskManagmentSystem.tms.models.CreateTaskModel;
 import com.example.taskManagmentSystem.tms.models.TaskModel;
 import com.example.taskManagmentSystem.tms.services.TaskService;
@@ -40,8 +39,8 @@ public class TaskController {
     @Operation(summary = "Get Task by id",
     security = @SecurityRequirement(name = "bearerAuth"))
     public TaskModel getTaskById(@PathVariable final int id,
-    @RequestAttribute final int userId) {
-        return taskService.getTask(id, userId);
+    @RequestAttribute final String userId) {
+        return taskService.getTaskByUserId(id, userId);
     }
 
     /**
@@ -56,8 +55,8 @@ public class TaskController {
     public List<TaskModel> getAllTasks(
     @RequestParam(defaultValue = "0") final int skip,
     @RequestParam(defaultValue = "10") final int limit,
-    @RequestAttribute final int userId) {
-        return taskService.getListOfTasks(userId, skip, limit);
+    @RequestAttribute final String userId) {
+        return taskService.getListOfTasksByUserId(userId, skip, limit);
     }
 
     /**
@@ -70,7 +69,7 @@ public class TaskController {
     security = @SecurityRequirement(name = "bearerAuth"))
     public TaskModel createNewTask(
             @Valid @RequestBody final CreateTaskModel createTaskModel,
-            @RequestAttribute final int userId) {
+            @RequestAttribute final String userId) {
         return taskService.createNewTask(createTaskModel, userId);
     }
 
