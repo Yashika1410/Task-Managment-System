@@ -9,22 +9,23 @@ import com.example.taskManagmentSystem.AuthService.entities.User;
 import com.example.taskManagmentSystem.AuthService.models.SignUpModel;
 import com.example.taskManagmentSystem.AuthService.repositories.UserRepo;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
-
 /**
  * User service class to perform operations for controller class.
  */
 @Service
 public class UserService {
-    /**
-     * Hashing cost.
-     */
-    private static final int HASH_COST = 10;
+   
     /**
      * Autowired User repo interface for db operations.
      */
     @Autowired
     private UserRepo userRepo;
+
+    /**
+     * Autowired password service for hashing and verify.
+     */
+    @Autowired
+    private PasswordService passwordService;
 
     /**
      * User Service method for creating new user and saving hash password.
@@ -38,8 +39,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "User Already Exits by this email or User name");
         } else {
-            user.setPassword(BCrypt.withDefaults().hashToString(HASH_COST,
-                    user.getPassword().toCharArray()));
+            user.setPassword(passwordService.hashPassword(user.getPassword()));
             User newUser = new User();
             newUser.setEmail(user.getEmail());
             newUser.setPassword(user.getPassword());
@@ -53,6 +53,7 @@ public class UserService {
         }
         
     }
+
     
     /**
      * User service method to chack user email and password and return user
@@ -65,8 +66,7 @@ public class UserService {
     public final User loginUser(final String emailOrUserName, final String password) {
         if (userRepo.existsByEmail(emailOrUserName.toLowerCase())) {
             User userDetails = userRepo.findByEmail(emailOrUserName);
-            if (BCrypt.verifyer().verify(password.toCharArray(),
-                    userDetails.getPassword()) != null) {
+            if (passwordService.verifyPassword(password, userDetails.getPassword())) {
                 return userDetails;
             } else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
@@ -74,8 +74,7 @@ public class UserService {
             }
         } else if(userRepo.existsByUserName(emailOrUserName)){
             User userDetails = userRepo.findByUserName(emailOrUserName);
-            if (BCrypt.verifyer().verify(password.toCharArray(),
-                    userDetails.getPassword()) != null) {
+            if (passwordService.verifyPassword(password, userDetails.getPassword())) {
                 return userDetails;
             } else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,

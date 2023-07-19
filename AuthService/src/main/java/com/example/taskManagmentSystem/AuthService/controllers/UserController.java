@@ -62,7 +62,7 @@ public class UserController {
     @PostMapping("/sign-in")
     public AuthModel signIn(@Valid @RequestBody final LoginModel user) {
         User authUser = userService.loginUser(
-                user.getEmailOrUserName(), user.getPassword());        
+                user.getEmailOrUserName(), user.getPassword());
         return new AuthModel(authUser,
         userJwtTokenService.getToken(authUser));
     }
