@@ -42,7 +42,7 @@ public interface TaskRepo extends CrudRepository<Task, Integer> {
      */
     @Query(nativeQuery = true,
     value = ("select * from tasks where id=:id and user_id=:userId"))
-    Optional<Task> findById(@Param(value = "id") int id,
+    Optional<Task> findByIdAndUserId(@Param(value = "id") int id,
     @Param(value = "userId") String userId);
     
 }

@@ -33,7 +33,7 @@ public class AdminTaskController {
      */
     @GetMapping("/{id}")
     public Task getTaskById(@PathVariable final int id,
-            @RequestAttribute final String userId, @RequestAttribute final String role) {
+    @RequestAttribute final String role) {
         if (role.equals("ADMIN")) {
             return taskService.getTask(id);
         }
@@ -50,7 +50,7 @@ public class AdminTaskController {
     public List<Task> getAllTasks(
             @RequestParam(defaultValue = "0") final int skip,
             @RequestParam(defaultValue = "10") final int limit,
-            @RequestAttribute final String userId, @RequestAttribute final String role) {
+            @RequestAttribute final String role) {
         if (role.equals("ADMIN")) {
             return taskService.getListOfTasks(skip, limit);
         }

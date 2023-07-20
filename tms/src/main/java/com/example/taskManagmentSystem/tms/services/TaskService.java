@@ -48,7 +48,7 @@ public class TaskService {
      */
     public TaskModel getTaskByUserId(final int id, final String userId) {
         return new TaskModel(
-            taskRepo.findById(id, userId).orElseThrow(
+            taskRepo.findByIdAndUserId(id, userId).orElseThrow(
             () -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Task Not Found by this id " + id)));
     }
@@ -95,7 +95,7 @@ public class TaskService {
      */
     public TaskModel updateTask(final String userId,
     final int id, final TaskModel taskModel) {
-        Task task = taskRepo.findById(id, userId).orElseThrow(
+        Task task = taskRepo.findByIdAndUserId(id, userId).orElseThrow(
             () -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Task Not Found by this id " + id));
         task.setTitle(taskModel.getTitle());

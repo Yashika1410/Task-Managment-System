@@ -33,6 +33,10 @@ public class TaskModel {
      */
     private Timestamp dueDate;
 
+    public TaskModel(){
+        
+    }
+
     /**
      * @param task task object.
      * @return TaskModel object.

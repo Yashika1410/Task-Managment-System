@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -46,8 +47,11 @@ public class UserControllerTest {
 
     @Autowired
     private UserJwtTokenService userJwtTokenService;
+
+    private User user;
     
-    private User createTestUser(){
+    @BeforeEach
+    void createTestUser(){
         User user = new User();
         user.setId("gvbhnjm4e5cfvg");
         user.setFirstName("test");
@@ -56,7 +60,7 @@ public class UserControllerTest {
         user.setUserName("testuser");
         user.setPassword("test1234");
         user.setRole(UserRole.USER);
-        return user;
+        this.user = user;
     }
 
     private String getToken(User user){
@@ -66,7 +70,6 @@ public class UserControllerTest {
     @Test
     public void registerUser() throws Exception {
         mapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE);
-        User user = createTestUser();
         user.setId(null);
         SignUpModel signUpModel = new SignUpModel(user.getFirstName(),
         user.getLastName(),user.getUserName(),user.getEmail(),user.getPassword());
@@ -87,7 +90,6 @@ public class UserControllerTest {
     @Test
     public void loginUser() throws Exception {
         mapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE);
-        User user = createTestUser();
         LoginModel loginModel = new LoginModel(user.getUserName(), user.getPassword());
         when(userRepo.existsByEmail(user.getEmail())).thenReturn(false);
         when(userRepo.existsByUserName(user.getUserName())).thenReturn(true);
@@ -104,7 +106,6 @@ public class UserControllerTest {
     @Test
     public void loginUserPasswordNotMatch() throws Exception {
         mapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE);
-        User user = createTestUser();
         LoginModel loginModel = new LoginModel(user.getUserName(), user.getPassword());
         when(userRepo.existsByEmail(user.getEmail())).thenReturn(false);
         when(userRepo.existsByUserName(user.getUserName())).thenReturn(true);
@@ -120,7 +121,6 @@ public class UserControllerTest {
     @Test
     public void userAlreadyExists() throws Exception {
         mapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE);
-        User user = createTestUser();
         SignUpModel signUpModel = new SignUpModel(user.getFirstName(),
         user.getLastName(),user.getUserName(),user.getEmail(),user.getPassword());
         signUpModel.setRole(null);
@@ -136,8 +136,6 @@ public class UserControllerTest {
     @Test
     public void getUserById() throws Exception {
         mapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE);
-        User user = createTestUser();
-        System.out.println(user.getId());
          when(userRepo.fetchByUserNameEmail(user.getEmail(),user.getUserName())).thenReturn(Optional.of(user));
          when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
          mockMvc.perform(
@@ -147,8 +145,6 @@ public class UserControllerTest {
     @Test
     public void getUserByInvalidId() throws Exception {
         mapper.enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE);
-        User user = createTestUser();
-        System.out.println(user.getId());
          when(userRepo.fetchByUserNameEmail(user.getEmail(),user.getUserName())).thenReturn(Optional.of(user));
          when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
          mockMvc.perform(

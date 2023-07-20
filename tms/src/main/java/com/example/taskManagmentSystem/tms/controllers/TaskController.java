@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -71,6 +72,20 @@ public class TaskController {
             @Valid @RequestBody final CreateTaskModel createTaskModel,
             @RequestAttribute final String userId) {
         return taskService.createNewTask(createTaskModel, userId);
+    }
+
+    /**
+     * @param createTaskModel CreateTaskModel object.
+     * @param userId user unique id
+     * @return Task object.
+     */
+    @PatchMapping("/{id}")
+    @Operation(summary = "Update task",
+    security = @SecurityRequirement(name = "bearerAuth"))
+    public TaskModel updateTask(
+            @Valid @RequestBody final TaskModel taskModel,
+            @RequestAttribute final String userId,@PathVariable final int id) {
+        return taskService.updateTask(userId,id,taskModel);
     }
 
 }
